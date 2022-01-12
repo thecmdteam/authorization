@@ -41,9 +41,10 @@ public class DefaultSecurityConfig {
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
 		http
 			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
+				authorizeRequests
+						.mvcMatchers("/signup", "/registerUser", "registration_consent").permitAll()
+						.anyRequest().authenticated()
 			)
-			.csrf().disable()
 		.formLogin(withDefaults())
 				.oauth2ResourceServer()
 				.jwt()

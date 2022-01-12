@@ -5,18 +5,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+import javax.validation.constraints.NotBlank;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateUserDTOMobile {
-    @NonNull
+public class CreateUserDTO {
+    @NotBlank(message = "Email is mandatory")
     private String email;
 
     private String phone;
-    @NonNull
+
+    @NotBlank(message = "First name is mandatory")
     String fName;
-    @NonNull
+    @NotBlank(message = "Last name is mandatory")
     String lName;
-    @NonNull
+
     String password;
+    String matchingPassword;
 }

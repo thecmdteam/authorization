@@ -1,6 +1,6 @@
 package com.cmd.authorization.controllers;
 
-import com.cmd.authorization.dto.CreateUserDTOMobile;
+import com.cmd.authorization.dto.CreateUserDTO;
 import com.cmd.authorization.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,7 @@ public class UserController {
     }
 
     @PostMapping("/createUser")
-    public ResponseEntity name(@RequestBody CreateUserDTOMobile user, Authentication auth) {
+    public ResponseEntity name(@RequestBody CreateUserDTO user, Authentication auth) {
         if (auth.getName().equals(ANDROID_CLIENT)) {
             return userService.createUserMobile(user);
         }

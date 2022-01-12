@@ -1,6 +1,6 @@
 package com.cmd.authorization.services;
 
-import com.cmd.authorization.dto.CreateUserDTOMobile;
+import com.cmd.authorization.dto.CreateUserDTO;
 import com.cmd.authorization.dto.UserDTO;
 import com.cmd.authorization.model.User;
 import com.cmd.authorization.repositories.UserRepository;
@@ -24,7 +24,7 @@ public class UserService {
         this.modelMapper = new ModelMapper();
     }
 
-    public ResponseEntity<Object> createUserMobile(CreateUserDTOMobile userDTO) {
+    public ResponseEntity<Object> createUserMobile(CreateUserDTO userDTO) {
         var optionalUser = userRepository.findByEmail(userDTO.getEmail());
 
         if (optionalUser.isPresent()) {
