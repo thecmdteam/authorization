@@ -31,3 +31,4 @@ spring:
           starttls:
             enable: true
 
+baseUrl: ${baseUrl}

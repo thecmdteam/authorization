@@ -22,9 +22,9 @@ public class User {
     private String email;
 
     private String phone;
-    String fName;
-    String lName;
-    String password;
+    private String fName;
+    private String lName;
+    private String password;
     private Date dateCreated;
     private Date lastUpdated;
     private String imageUrl;

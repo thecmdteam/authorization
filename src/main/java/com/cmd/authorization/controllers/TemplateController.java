@@ -7,6 +7,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class TemplateController {
@@ -28,5 +29,10 @@ public class TemplateController {
     public String registerUser(@ModelAttribute CreateUserDTO userDTO) {
         userService.createUserMobile(userDTO);
         return "registration_consent";
+    }
+
+    @GetMapping("/verify")
+    public String verifyEmail(@RequestParam("token_id") String tokenId) {
+        return null
     }
 }

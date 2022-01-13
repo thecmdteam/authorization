@@ -2,6 +2,7 @@ package com.cmd.authorization.services;
 
 import com.cmd.authorization.dto.CreateUserDTO;
 import com.cmd.authorization.dto.UserDTO;
+import com.cmd.authorization.events.CreateNewUserEvent;
 import com.cmd.authorization.model.User;
 import com.cmd.authorization.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -41,6 +42,7 @@ public class UserService {
             user.setDateCreated(new Date(System.currentTimeMillis()));
             user = userRepository.save(user);
             var createdUser = modelMapper.map(user, UserDTO.class);
+            applicationEventPublisher.publishEvent(new CreateNewUserEvent(userDTO));
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(createdUser);
         }
