@@ -17,6 +17,7 @@ package com.cmd.authorization.config;
 
 import com.cmd.authorization.security.CmdUserDetailsService;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
