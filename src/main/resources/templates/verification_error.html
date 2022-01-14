@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Account Created</title>
+    <title>Error</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="../static/css/style.css">
 
 </head>
@@ -14,10 +14,7 @@
 <div class="container" style="padding-top: 10%">
     <div class="card" style="width: 18rem; margin: auto" >
         <div class="card-body">
-            <h5 class="card-title">Message Received</h5>
-            <p class="card-text">Your account has been created. Log into your email to activate
-            your account, by clicking the link contained in the mail. After a few minutes if don't
-            see the mail in your inbox, do check your spam folder.</p>
+            <p class="card-text">Your link seems to <span th:text="${error}"></span>.</p>
         </div>
     </div>
 

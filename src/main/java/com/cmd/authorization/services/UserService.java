@@ -29,12 +29,11 @@ public class UserService {
         this.modelMapper = new ModelMapper();
     }
 
-    public ResponseEntity<Object> createUserMobile(CreateUserDTO userDTO) {
+    public boolean createUserMobile(CreateUserDTO userDTO) {
         var optionalUser = userRepository.findByEmail(userDTO.getEmail());
 
         if (optionalUser.isPresent()) {
-             return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body("User Already exists");
+             return false;
         }
         else {
             var user = modelMapper.map(userDTO, User.class);
@@ -43,8 +42,7 @@ public class UserService {
             user = userRepository.save(user);
             var createdUser = modelMapper.map(user, UserDTO.class);
             applicationEventPublisher.publishEvent(new CreateNewUserEvent(userDTO));
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                    .body(createdUser);
+            return true;
         }
     }
 }

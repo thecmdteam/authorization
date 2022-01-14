@@ -19,12 +19,4 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/createUser")
-    public ResponseEntity name(@RequestBody CreateUserDTO user, Authentication auth) {
-        if (auth.getName().equals(ANDROID_CLIENT)) {
-            return userService.createUserMobile(user);
-        }
-        return ResponseEntity.ok()
-                .body("Wrong client");
-    }
 }

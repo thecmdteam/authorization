@@ -37,34 +37,35 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class DefaultSecurityConfig {
 
-	// @formatter:off
-	@Bean
-	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-		http
-			.authorizeRequests(authorizeRequests ->
-				authorizeRequests
-						.mvcMatchers("/signup", "/registerUser", "registration_consent").permitAll()
-						.anyRequest().authenticated()
-			)
-		.formLogin(withDefaults())
-				.oauth2ResourceServer()
-				.jwt()
-				;
-		return http.build();
-	}
-	// @formatter:on
+    // @formatter:off
+    @Bean
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests(authorizeRequests ->
+                        authorizeRequests
+                                .mvcMatchers("/signup", "/registerUser", "registration_consent",
+                                        "/verify").permitAll()
+                                .anyRequest().authenticated()
+                )
+                .formLogin(withDefaults())
+                .oauth2ResourceServer()
+                .jwt()
+        ;
+        return http.build();
+    }
+    // @formatter:on
 
-	// @formatter:off
-	@Bean
-	UserDetailsService users() {
+    // @formatter:off
+    @Bean
+    UserDetailsService users() {
 
-		return new CmdUserDetailsService();
-	}
-	// @formatter:on
+        return new CmdUserDetailsService();
+    }
+    // @formatter:on
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.cmd.authorization.services;
 
 import com.cmd.authorization.model.User;
+import com.cmd.authorization.model.VerifyTokenStates;
 import com.cmd.authorization.repositories.UserRepository;
 import com.cmd.authorization.repositories.VerificationTokenRepo;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ public class TokenService {
         this.userRepository = userRepository;
     }
 
-    public String verifyToken(String tokenId) {
+    public VerifyTokenStates verifyToken(String tokenId) {
         var optionalToken = tokenRepo.findById(tokenId);
 
         if(optionalToken.isPresent()) {
@@ -27,17 +28,17 @@ public class TokenService {
             tokenRepo.delete(token);
             var presentDate = new Date(System.currentTimeMillis());
             if(presentDate.after(token.getExpiryDate())) {
-                return "expired token";
+                return VerifyTokenStates.EXPIRED_TOKEN;
             }
             var optionalUser = userRepository.findByEmail(token.getUserEmail());
             if (optionalUser.isEmpty()) {
-                return "user doesn't exist";
+                return VerifyTokenStates.INVALID_TOKEN;
             }
             var user = optionalUser.get();
             enableUser(user);
-            return "succes";
+            return VerifyTokenStates.VALID_TOKEN;
         }
-        return "invalid token";
+        return VerifyTokenStates.INVALID_TOKEN;
     }
 
     private void enableUser(User user) {
@@ -47,6 +48,7 @@ public class TokenService {
         user.setAccountNonLocked(true);
         user.setCredentialsNonExpired(true);
         user.setAuthorities(List.of("USER"));
+        userRepository.save(user);
     }
 
 }

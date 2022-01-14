@@ -3,24 +3,23 @@ package com.cmd.authorization.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class CreateUserDTO {
-    @NotBlank(message = "Email is mandatory")
+    private String fName;
+
+    private String lName;
+
     private String email;
 
-    private String phone;
+    private String password;
 
-    @NotBlank(message = "First name is mandatory")
-    String fName;
-    @NotBlank(message = "Last name is mandatory")
-    String lName;
-
-    String password;
-    String matchingPassword;
+    private String matchingPassword;
 }
