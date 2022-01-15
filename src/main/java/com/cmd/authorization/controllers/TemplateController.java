@@ -32,6 +32,10 @@ public class TemplateController {
 
     @PostMapping("/signup")
     public String registerUser( @ModelAttribute("user") CreateUserDTO userDTO, Model model) {
+        if(!userDTO.getPassword().equals(userDTO.getMatchingPassword())){
+            model.addAttribute("errors", "Passwords don't match");
+            return "signup";
+        }
         if (userService.createUserMobile(userDTO))
             return "registration_consent";
         model.addAttribute("errors", "Account with email already exists");
@@ -51,7 +55,7 @@ public class TemplateController {
                 model.addAttribute("error", "to have expired");
                 yield "verification_error";
             }
-            case VALID_TOKEN -> "login";
+            case VALID_TOKEN -> "redirect:login";
 
         };
     }
