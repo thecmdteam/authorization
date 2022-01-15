@@ -5,6 +5,7 @@ import com.cmd.authorization.services.TokenService;
 import com.cmd.authorization.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -30,7 +31,7 @@ public class TemplateController {
     }
 
     @PostMapping("/signup")
-    public String registerUser(@Valid @ModelAttribute("user") CreateUserDTO userDTO, Model model) {
+    public String registerUser( @ModelAttribute("user") CreateUserDTO userDTO, Model model) {
         if (userService.createUserMobile(userDTO))
             return "registration_consent";
         model.addAttribute("errors", "Account with email already exists");
