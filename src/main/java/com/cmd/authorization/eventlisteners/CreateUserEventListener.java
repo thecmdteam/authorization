@@ -28,7 +28,7 @@ public class CreateUserEventListener {
 
     @EventListener
     public void emailUser(CreateNewUserEvent newUserEvent) {
-        var user = newUserEvent.userDTO();
+        var user = newUserEvent.user();
         var verificationToken = new VerificationToken();
         verificationToken.setUserEmail(user.getEmail());
         verificationToken.setExpiryDate(addHoursToDate(new Date(System.currentTimeMillis()), 24));

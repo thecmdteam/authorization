@@ -1,14 +1,14 @@
 package com.cmd.authorization.controllers;
 
-import com.cmd.authorization.dto.CreateUserDTO;
+import com.cmd.authorization.model.User;
 import com.cmd.authorization.services.TokenService;
 import com.cmd.authorization.services.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class TemplateController {
@@ -21,22 +21,23 @@ public class TemplateController {
         this.tokenService = tokenService;
     }
 
+
     @GetMapping("/signup")
     public String signUp(Model model) {
-        CreateUserDTO userDTO = new CreateUserDTO();
-        model.addAttribute("user", userDTO);
+        User user = new User();
+        model.addAttribute("user", user);
         model.addAttribute("errors", null);
 
         return "signup";
     }
 
     @PostMapping("/signup")
-    public String registerUser( @ModelAttribute("user") CreateUserDTO userDTO, Model model) {
-        if(!userDTO.getPassword().equals(userDTO.getMatchingPassword())){
+    public String registerUser( @ModelAttribute("user") User user, Model model) {
+        if(!user.getPassword().equals(user.getMatchingPassword())){
             model.addAttribute("errors", "Passwords don't match");
             return "signup";
         }
-        if (userService.createUserMobile(userDTO))
+        if (userService.createUserMobile(user))
             return "registration_consent";
         model.addAttribute("errors", "Account with email already exists");
         return "signup";

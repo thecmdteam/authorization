@@ -8,11 +8,6 @@ logging:
 #    org.springframework.boot.autoconfigure: DEBUG
 
 spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://auth-server:8080
   data:
     mongodb:
       uri: ${mongoUri}
@@ -32,3 +27,7 @@ spring:
             enable: true
 
 baseUrl: ${baseUrl}
+server:
+  error:
+    whitelabel:
+      enabled: false
