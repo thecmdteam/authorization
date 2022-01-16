@@ -16,15 +16,20 @@
 package com.cmd.authorization.config;
 
 import com.cmd.authorization.jose.Jwks;
+import com.cmd.authorization.model.CmdClient;
+import com.cmd.authorization.repositories.CmdClientRepository;
+import com.cmd.authorization.security.CmdRegisteredClientRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -51,6 +56,9 @@ public class AuthorizationServerConfig {
 
 	@Value("${baseUrl}")
 	private String baseUrl;
+
+	@Autowired
+	private CmdClientRepository clientRepository;
 
 	@Bean
 	@Order(Ordered.HIGHEST_PRECEDENCE)
@@ -90,8 +98,11 @@ public class AuthorizationServerConfig {
 						.build())
 				.build();
 
+		var clientRepo = new CmdRegisteredClientRepository();
+		clientRepo.save(webClient);
+		clientRepo.save(androidClient);
 
-		return new InMemoryRegisteredClientRepository(webClient, androidClient);
+		return clientRepo;
 	}
 	// @formatter:on
 
@@ -109,5 +120,10 @@ public class AuthorizationServerConfig {
 		return ProviderSettings.builder().issuer(baseUrl).build();
 	}
 
+
+	@Autowired
+	public void setMapKeyDotReplacement(MappingMongoConverter mongoConverter) {
+		mongoConverter.setMapKeyDotReplacement("#");
+	}
 
 }
