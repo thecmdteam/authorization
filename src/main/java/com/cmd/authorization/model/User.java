@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Document
 @Data
@@ -40,5 +41,6 @@ public class User {
     private boolean isAccountNonLocked;
     private boolean isAccountNonExpired;
     private List<String> authorities;
+    private Map<String, String> keyValues;
 
 }

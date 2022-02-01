@@ -2,13 +2,16 @@ package com.cmd.authorization.security;
 
 import com.cmd.authorization.model.CmdClient;
 import com.cmd.authorization.repositories.CmdClientRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 
 public class CmdRegisteredClientRepository implements RegisteredClientRepository {
-    @Autowired
-    private CmdClientRepository clientRepository;
+
+    private final CmdClientRepository clientRepository;
+
+    public CmdRegisteredClientRepository(CmdClientRepository clientRepository) {
+        this.clientRepository = clientRepository;
+    }
 
 
     @Override

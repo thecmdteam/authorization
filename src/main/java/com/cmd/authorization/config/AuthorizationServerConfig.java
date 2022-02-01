@@ -16,7 +16,6 @@
 package com.cmd.authorization.config;
 
 import com.cmd.authorization.jose.Jwks;
-import com.cmd.authorization.model.CmdClient;
 import com.cmd.authorization.repositories.CmdClientRepository;
 import com.cmd.authorization.security.CmdRegisteredClientRepository;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -37,7 +36,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
@@ -98,7 +96,7 @@ public class AuthorizationServerConfig {
 						.build())
 				.build();
 
-		var clientRepo = new CmdRegisteredClientRepository();
+		var clientRepo = new CmdRegisteredClientRepository(clientRepository);
 		clientRepo.save(webClient);
 		clientRepo.save(androidClient);
 
