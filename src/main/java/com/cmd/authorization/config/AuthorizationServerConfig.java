@@ -78,7 +78,7 @@ public class AuthorizationServerConfig {
 				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
 				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
 				.redirectUri("http://127.0.0.1:8000/login/oauth2/code/messaging-client-oidc")
-				.redirectUri("http://127.0.0.1:8000/authorized")
+				.redirectUri("http://127.0.0.1:3000/home")
 				.scope(OidcScopes.OPENID)
 				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
 				.build();
