@@ -16,19 +16,18 @@
 package com.cmd.authorization.config;
 
 import com.cmd.authorization.jose.Jwks;
-import com.cmd.authorization.repositories.CmdClientRepository;
+import com.cmd.authorization.security.CmdOAuth2AuthorizationConsentService;
+import com.cmd.authorization.security.CmdOAuth2AuthorizationService;
 import com.cmd.authorization.security.CmdRegisteredClientRepository;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
@@ -36,12 +35,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.client.InMemoryRegisteredClientRepository;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
-import org.springframework.security.oauth2.server.authorization.config.TokenSettings;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.UUID;
@@ -53,76 +52,34 @@ import java.util.UUID;
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
 
-	@Value("${baseUrl}")
-	private String baseUrl;
-
-	@Autowired
-	private CmdClientRepository clientRepository;
-
-	@Bean
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-		return http.formLogin(Customizer.withDefaults())
-				.build();
-	}
-
-	// @formatter:off
-	@Bean
-	public RegisteredClientRepository registeredClientRepository(PasswordEncoder passwordEncoder) {
-		var webClient = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("web-client")
-				.clientSecret(passwordEncoder.encode("secret"))
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.redirectUri("http://127.0.0.1:8000/login/oauth2/code/messaging-client-oidc")
-				.redirectUri("https://oauth2-app-001.herokuapp.com/")
-				.scope(OidcScopes.OPENID)
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-				.build();
-
-		var androidClient = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("android-client")
-				.clientSecret(passwordEncoder.encode("secret"))
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.PASSWORD)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.scope(OidcScopes.OPENID)
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-				.tokenSettings(TokenSettings.builder()
-						.reuseRefreshTokens(true)
-						.build())
-				.build();
-
-		var clientRepo = new InMemoryRegisteredClientRepository(webClient, androidClient);
-//		clientRepo.save(webClient);
-//		clientRepo.save(androidClient);
-
-		return clientRepo;
-	}
-	// @formatter:on
+    @Value("${baseUrl}")
+    private String baseUrl;
 
 
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
+        return http.formLogin(Customizer.withDefaults())
+                .build();
+    }
 
-	@Bean
-	public JWKSource<SecurityContext> jwkSource() {
-		RSAKey rsaKey = Jwks.generateRsa();
-		JWKSet jwkSet = new JWKSet(rsaKey);
-		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
-	}
+    // @formatter:off
 
-	@Bean
-	public ProviderSettings providerSettings() {
-		return ProviderSettings.builder().issuer(baseUrl).build();
-	}
+    // @formatter:on
 
 
-	@Autowired
-	public void setMapKeyDotReplacement(MappingMongoConverter mongoConverter) {
-		mongoConverter.setMapKeyDotReplacement("#");
-	}
+    @Bean
+    public JWKSource<SecurityContext> jwkSource() {
+        RSAKey rsaKey = Jwks.generateRsa();
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+    }
+
+    @Bean
+    public ProviderSettings providerSettings() {
+        return ProviderSettings.builder().issuer(baseUrl).build();
+    }
+
 
 }

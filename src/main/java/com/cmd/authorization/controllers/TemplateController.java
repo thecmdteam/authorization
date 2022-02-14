@@ -1,5 +1,6 @@
 package com.cmd.authorization.controllers;
 
+import com.cmd.authorization.dto.UserDTO;
 import com.cmd.authorization.model.User;
 import com.cmd.authorization.services.TokenService;
 import com.cmd.authorization.services.UserService;
@@ -25,7 +26,7 @@ public class TemplateController {
 
     @GetMapping("/signup")
     public String signUp(Model model) {
-        User user = new User();
+        UserDTO user = new UserDTO();
         model.addAttribute("user", user);
         model.addAttribute("errors", null);
 
@@ -33,7 +34,7 @@ public class TemplateController {
     }
 
     @PostMapping("/signup")
-    public String registerUser( @ModelAttribute("user") User user, Model model) {
+    public String registerUser(@ModelAttribute("user") UserDTO user, Model model) {
         if(!user.getPassword().equals(user.getMatchingPassword())){
             model.addAttribute("errors", "Passwords don't match");
             return "signup";

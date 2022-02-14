@@ -1,4 +1,4 @@
-package com.cmd.authorization.model;
+package com.cmd.authorization.model.enums;
 
 public enum VerifyTokenStates {
     EXPIRED_TOKEN,

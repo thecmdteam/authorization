@@ -1,5 +1,6 @@
 package com.cmd.authorization.services;
 
+import com.cmd.authorization.dto.UserDTO;
 import com.cmd.authorization.events.CreateNewUserEvent;
 import com.cmd.authorization.model.User;
 import com.cmd.authorization.repositories.UserRepository;
@@ -10,30 +11,27 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 @Service
-public class UserService {
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final ApplicationEventPublisher applicationEventPublisher;
+public record UserService(UserRepository userRepository,
+                          PasswordEncoder passwordEncoder,
+                          ApplicationEventPublisher applicationEventPublisher) {
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-                       ApplicationEventPublisher applicationEventPublisher) {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.applicationEventPublisher = applicationEventPublisher;
-    }
-
-    public boolean createUserMobile(User user) {
-        var optionalUser = userRepository.findByEmail(user.getEmail());
+    public boolean createUserMobile(UserDTO user) {
+        var optionalUser = userRepository.findByUsername(user.getEmail());
 
         if (optionalUser.isPresent()) {
-             return false;
-        }
-        else {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            user.setDateCreated(new Date(System.currentTimeMillis()));
-            userRepository.save(user);
+            return false;
+        } else {
+            User newUser = mapUser(user);
+            userRepository.save(newUser);
             applicationEventPublisher.publishEvent(new CreateNewUserEvent(user));
             return true;
         }
+    }
+
+    private User mapUser(UserDTO user) {
+        User newUser = new User();
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        newUser.setUsername(user.getEmail());
+        return newUser;
     }
 }

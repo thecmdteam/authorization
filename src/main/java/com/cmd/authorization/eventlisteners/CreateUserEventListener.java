@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.mail.MessagingException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class CreateUserEventListener {
@@ -30,8 +31,9 @@ public class CreateUserEventListener {
     public void emailUser(CreateNewUserEvent newUserEvent) {
         var user = newUserEvent.user();
         var verificationToken = new VerificationToken();
-        verificationToken.setUserEmail(user.getEmail());
+        verificationToken.setUsername(user.getEmail());
         verificationToken.setExpiryDate(addHoursToDate(new Date(System.currentTimeMillis()), 24));
+        verificationToken.setTokenId(UUID.randomUUID().toString());
         verificationToken = tokenRepo.save(verificationToken);
         var tokenId = verificationToken.getTokenId();
         var link = baseUrl+"/verify?token_id="+tokenId;

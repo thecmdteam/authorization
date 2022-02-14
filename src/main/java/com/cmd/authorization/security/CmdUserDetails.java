@@ -1,27 +1,30 @@
 package com.cmd.authorization.security;
 
 import com.cmd.authorization.model.User;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-public class CmdUserDetails implements UserDetails {
-    private final User user;
-
-    public CmdUserDetails(User user) {
-        this.user = user;
-    }
+public record CmdUserDetails(User user) implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return user.getAuthorities().stream()
-//                .map(a -> new SimpleGrantedAuthority(a))
-//                .toList();
-        return List.of(new SimpleGrantedAuthority("user"));
+       Set<GrantedAuthority> authorities = new HashSet<>();
+       authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+       return authorities;
     }
+
+
+//    @JsonGetter("authorities")
+//    public GrantedAuthority[] grantedAuthorities() {
+//        return new GrantedAuthority[] {new SimpleGrantedAuthority("ROLE_USER")};
+//    }
 
     @Override
     public String getPassword() {
@@ -30,7 +33,7 @@ public class CmdUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return user.getEmail();
+        return user.getUsername();
     }
 
     @Override
