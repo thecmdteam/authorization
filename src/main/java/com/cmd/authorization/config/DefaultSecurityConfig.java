@@ -52,9 +52,9 @@ public class DefaultSecurityConfig {
                                         "/verify").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())
-                //.loginPage("/login")
-                //.permitAll()
+                .formLogin()
+                .loginPage("/login")
+                .permitAll()
                 ;
 
         return http.build();
