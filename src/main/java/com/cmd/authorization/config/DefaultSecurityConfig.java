@@ -15,29 +15,24 @@
  */
 package com.cmd.authorization.config;
 
-import com.cmd.authorization.security.CmdRegisteredClientRepository;
-import com.cmd.authorization.security.CmdUserDetails;
-import com.cmd.authorization.security.CmdUserDetailsService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cmd.authorization.security.UsernamePasswordAuthentication;
+import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.jackson2.CoreJackson2Module;
-import org.springframework.security.oauth2.core.AuthorizationGrantType;
-import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
-import org.springframework.security.oauth2.core.oidc.OidcScopes;
-import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
-import org.springframework.security.oauth2.server.authorization.config.ClientSettings;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import javax.sql.DataSource;
-import java.util.UUID;
 
 /**
  * @author Joe Grandja
@@ -57,21 +52,19 @@ public class DefaultSecurityConfig {
                                         "/verify").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .formLogin()
-                .loginPage("/login")
-                .permitAll()
-        ;
+                .formLogin(Customizer.withDefaults())
+                //.loginPage("/login")
+                //.permitAll()
+                ;
+
         return http.build();
     }
-    // @formatter:on
 
-    // @formatter:off
     @Bean
-    UserDetailsService users() {
-
-        return new CmdUserDetailsService();
+    public UserDetailsService users(DataSource dataSource) throws Exception {
+        var jdbcUserDetails = new JdbcUserDetailsManager(dataSource);
+        return jdbcUserDetails;
     }
-    // @formatter:on
 
     @Bean
     public PasswordEncoder passwordEncoder() {

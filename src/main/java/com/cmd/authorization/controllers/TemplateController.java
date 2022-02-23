@@ -1,7 +1,6 @@
 package com.cmd.authorization.controllers;
 
 import com.cmd.authorization.dto.UserDTO;
-import com.cmd.authorization.model.User;
 import com.cmd.authorization.services.TokenService;
 import com.cmd.authorization.services.UserService;
 import org.springframework.stereotype.Controller;
@@ -39,7 +38,7 @@ public class TemplateController {
             model.addAttribute("errors", "Passwords don't match");
             return "signup";
         }
-        if (userService.createUserMobile(user))
+        if (userService.createUser(user))
             return "registration_consent";
         model.addAttribute("errors", "Account with email already exists");
         return "signup";

@@ -2,15 +2,25 @@ package com.cmd.authorization.services;
 
 import com.cmd.authorization.model.User;
 import com.cmd.authorization.model.enums.VerifyTokenStates;
-import com.cmd.authorization.repositories.UserRepository;
 import com.cmd.authorization.repositories.VerificationTokenRepo;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Service
-public record TokenService(VerificationTokenRepo tokenRepo,
-                           UserRepository userRepository) {
+public final class TokenService {
+    private final VerificationTokenRepo tokenRepo;
+    private final JdbcUserDetailsManager userDetailsManager;
+
+    public TokenService(VerificationTokenRepo tokenRepo,
+                        UserDetailsService userDetailsManager) {
+        this.tokenRepo = tokenRepo;
+        this.userDetailsManager = (JdbcUserDetailsManager) userDetailsManager;
+    }
 
     public VerifyTokenStates verifyToken(String tokenId) {
         var optionalToken = tokenRepo.findById(tokenId);
@@ -22,23 +32,24 @@ public record TokenService(VerificationTokenRepo tokenRepo,
             if (presentDate.after(token.getExpiryDate())) {
                 return VerifyTokenStates.EXPIRED_TOKEN;
             }
-            var optionalUser = userRepository.findByUsername(token.getUsername());
-            if (optionalUser.isEmpty()) {
+            var u = userDetailsManager.loadUserByUsername(token.getUsername());
+            if (u == null) {
                 return VerifyTokenStates.INVALID_TOKEN;
             }
-            var user = optionalUser.get();
-            enableUser(user);
+            var user = mapUser(u);
+            userDetailsManager.updateUser(user);
             return VerifyTokenStates.VALID_TOKEN;
         }
         return VerifyTokenStates.INVALID_TOKEN;
     }
 
-    private void enableUser(User user) {
+    private User mapUser(UserDetails u) {
+        var user = new User();
+        user.setUsername(u.getUsername());
+        user.setPassword(u.getPassword());
         user.setEnabled(true);
-        user.setAccountNonExpired(true);
-        user.setAccountNonLocked(true);
-        user.setCredentialsNonExpired(true);
-        userRepository.save(user);
+        return user;
     }
+
 
 }
