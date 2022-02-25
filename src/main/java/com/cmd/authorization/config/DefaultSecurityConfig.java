@@ -64,7 +64,7 @@ public class DefaultSecurityConfig {
                 .cors(c -> {
             CorsConfigurationSource cs = request -> {
                 CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("https://cmd-app.netlify.app"));
+                configuration.setAllowedOrigins(List.of("*"));
                 configuration.setAllowedMethods(List.of("GET","POST"));
                 return configuration;
             };
