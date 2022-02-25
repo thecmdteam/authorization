@@ -26,13 +26,18 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Joe Grandja
@@ -55,10 +60,20 @@ public class DefaultSecurityConfig {
                 .formLogin()
                 .loginPage("/login")
                 .permitAll()
-                ;
+                .and()
+                .cors(c -> {
+            CorsConfigurationSource cs = request -> {
+                CorsConfiguration configuration = new CorsConfiguration();
+                configuration.setAllowedOrigins(List.of("https://cmd-app.netlify.app"));
+                configuration.setAllowedMethods(List.of("GET","POST"));
+                return configuration;
+            };
+            c.configurationSource(cs);});
 
         return http.build();
     }
+
+
 
     @Bean
     public UserDetailsService users(DataSource dataSource) throws Exception {
