@@ -29,7 +29,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationConsentService;
 import org.springframework.security.oauth2.server.authorization.JdbcOAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationConsentService;
@@ -38,6 +37,10 @@ import org.springframework.security.oauth2.server.authorization.client.JdbcRegis
 import org.springframework.security.oauth2.server.authorization.client.RegisteredClientRepository;
 import org.springframework.security.oauth2.server.authorization.config.ProviderSettings;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 /**
  * @author Joe Grandja
@@ -56,6 +59,15 @@ public class AuthorizationServerConfig {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
         return http
                 .formLogin(Customizer.withDefaults())
+                .cors(c -> {
+                    CorsConfigurationSource cs = request -> {
+                        CorsConfiguration configuration = new CorsConfiguration();
+                        configuration.setAllowedOrigins(List.of("*"));
+                        configuration.setAllowedMethods(List.of("GET", "POST"));
+                        return configuration;
+                    };
+                    c.configurationSource(cs);
+                })
                 .build();
     }
 

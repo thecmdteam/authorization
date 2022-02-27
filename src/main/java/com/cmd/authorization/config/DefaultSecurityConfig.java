@@ -15,18 +15,9 @@
  */
 package com.cmd.authorization.config;
 
-import com.cmd.authorization.security.UsernamePasswordAuthentication;
-import org.springframework.boot.autoconfigure.batch.BatchProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -36,7 +27,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -60,19 +50,10 @@ public class DefaultSecurityConfig {
                 .formLogin()
                 .loginPage("/login")
                 .permitAll()
-                .and()
-                .cors(c -> {
-            CorsConfigurationSource cs = request -> {
-                CorsConfiguration configuration = new CorsConfiguration();
-                configuration.setAllowedOrigins(List.of("*"));
-                configuration.setAllowedMethods(List.of("GET","POST"));
-                return configuration;
-            };
-            c.configurationSource(cs);});
+                ;
 
         return http.build();
     }
-
 
 
     @Bean
@@ -85,7 +66,6 @@ public class DefaultSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
 
 }
