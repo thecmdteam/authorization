@@ -39,7 +39,9 @@ import org.springframework.security.oauth2.server.authorization.config.ProviderS
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -56,18 +58,9 @@ public class AuthorizationServerConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        return http
+        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http.cors().and());
+        return http.cors().and().csrf().disable()
                 .formLogin(Customizer.withDefaults())
-                .cors(c -> {
-                    CorsConfigurationSource cs = request -> {
-                        CorsConfiguration configuration = new CorsConfiguration();
-                        configuration.setAllowedOrigins(List.of("*"));
-                        configuration.setAllowedMethods(List.of("GET", "POST"));
-                        return configuration;
-                    };
-                    c.configurationSource(cs);
-                })
                 .build();
     }
 
@@ -90,8 +83,6 @@ public class AuthorizationServerConfig {
     }
 
 
-
-
     @Bean
     public JWKSource<SecurityContext> jwkSource() {
         RSAKey rsaKey = Jwks.generateRsa();
@@ -104,5 +95,14 @@ public class AuthorizationServerConfig {
         return ProviderSettings.builder().issuer(baseUrl).build();
     }
 
-
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
+        configuration.setAllowedHeaders(List.of("Origin", "Content-Type", "Accept", "responseType", "Authorization"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

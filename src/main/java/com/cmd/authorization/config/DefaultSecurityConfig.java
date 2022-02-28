@@ -23,11 +23,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 /**
  * @author Joe Grandja
@@ -40,7 +37,7 @@ public class DefaultSecurityConfig {
     // @formatter:off
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
+        http.cors().and().csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
                                 .mvcMatchers("/signup", "/registerUser", "registration_consent",
@@ -49,11 +46,11 @@ public class DefaultSecurityConfig {
                 )
                 .formLogin()
                 .loginPage("/login")
-                .permitAll()
-                ;
+                .permitAll();
 
         return http.build();
     }
+
 
 
     @Bean
