@@ -57,7 +57,7 @@ public class TemplateController {
                 model.addAttribute("error", "to have expired");
                 yield "verification_error";
             }
-            case VALID_TOKEN -> "redirect:login";
+            case VALID_TOKEN -> "redirect:https://cmd-app.netlify.app/validate";
 
         };
     }
