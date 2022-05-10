@@ -8,6 +8,8 @@ logging:
 #    org.springframework.boot.autoconfigure: DEBUG
 
 spring:
+  profiles:
+    active: dev
   datasource:
     url: ${dbHost}
     username: ${dbUsername}
