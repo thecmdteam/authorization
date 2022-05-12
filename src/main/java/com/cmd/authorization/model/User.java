@@ -21,7 +21,7 @@ public class User implements UserDetails{
     private boolean credentialsNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean accountNonExpired = true;
-    private List<GrantedAuthority> authorities = new ArrayList<>(List.of(new SimpleGrantedAuthority("User")));
+    private List<GrantedAuthority> authorities = new ArrayList<>(List.of(new SimpleGrantedAuthority("USER")));
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

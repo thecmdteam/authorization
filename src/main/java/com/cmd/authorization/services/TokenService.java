@@ -43,6 +43,21 @@ public final class TokenService {
         return VerifyTokenStates.INVALID_TOKEN;
     }
 
+    public UserDetails verifyRecoveryToken(String tokenId) {
+        var optionalToken = tokenRepo.findById(tokenId);
+
+        if (optionalToken.isPresent()) {
+            var token = optionalToken.get();
+            tokenRepo.delete(token);
+            var presentDate = new Date(System.currentTimeMillis());
+            if (presentDate.after(token.getExpiryDate())) {
+                return null;
+            }
+            return userDetailsManager.loadUserByUsername(token.getUsername());
+        }
+        return null;
+    }
+
     private User mapUser(UserDetails u) {
         var user = new User();
         user.setUsername(u.getUsername());

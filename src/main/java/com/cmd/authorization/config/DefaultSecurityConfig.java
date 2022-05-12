@@ -15,7 +15,10 @@
  */
 package com.cmd.authorization.config;
 
+import com.cmd.authorization.security.FederatedIdentityConfigurer;
+import com.cmd.authorization.security.UserRepositoryOAuth2UserHandler;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,16 +40,26 @@ public class DefaultSecurityConfig {
     // @formatter:off
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+        FederatedIdentityConfigurer federatedIdentityConfigurer = new FederatedIdentityConfigurer()
+                .oauth2UserHandler(new UserRepositoryOAuth2UserHandler());
+
         http.cors().and().csrf().disable()
                 .authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                                .mvcMatchers("/signup", "/registerUser", "registration_consent",
-                                        "/verify").permitAll()
+                                .mvcMatchers("/signup",
+                                        "registration_consent",
+                                        "/verify",
+                                        "/forgotPassword",
+                                        "/changePassword",
+                                        "/recover",
+                                        "/assets/*",
+                                        "/js/*",
+                                        "/styles/*",
+                                        "/login").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .formLogin()
-                .loginPage("/login")
-                .permitAll();
+                .formLogin(Customizer.withDefaults())
+                .apply(federatedIdentityConfigurer);
 
         return http.build();
     }

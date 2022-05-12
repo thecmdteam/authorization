@@ -1,146 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="../static/css/style.css">
-
+    <link rel="stylesheet" th:href="@{/styles/styles.css}">
+    <link rel="stylesheet" th:href="@{/styles/sign-up.css}" />
 </head>
-<body style="background-color: darkgrey">
-<div class="container" style="width: 25rem; margin-top: 2rem; background-color: antiquewhite">
-    <div class="card card-body">
-        <div class="text-center">
-            <h3>SignUp</h3>
-            <i class="fas fa-user-circle" style="font-size: 3rem;"></i>
-            <h6 style="color: red" th:hidden="${errors == null}" th:text="${errors}"></h6>
-        </div>
-        <form method="POST" action="#" th:action="@{/signup}" th:object="${user}">
-            <div class="form-group">
 
-                <label th:for="fName" class="mt-3">First Name</label>
-                <input type="text" th:field="*{firstName}" class="form-control" id="fName" required>
-
-                <label for="lName" class="mt-3">Last Name</label>
-                <input type="text" th:field="*{lastName}" class="form-control" id="lName" required>
-
-                <label for="email" class="mt-3">Email</label>
-                <input type="email" class="form-control" id="email" name="email" th:field="*{email}" required>
-
-                <label class="mt-3">Password</label>
-                <input type="password" name="password" th:field="*{password}"
-                       class="form-control" id="password" required>
-
-                <label for="confirm_password" class="mt-3">Password</label>
-                <input type="password" name="confirm_password" id="confirm_password" th:field="*{matchingPassword}"
-                       class="form-control" required>
-
-                <input type="submit" class="form-control btn-dark mt-3" th:name="submit" value="Submit">
+<body>
+    <div class="container">
+        <div class="sign_up_container">
+            <div class="left_section">
+                <img th:src="@{/assets/cmd.svg}" />
+                <p>A space to share knowledge, ask questions and
+                    better understand tech.</p>
             </div>
-        </form>
+            <div class="right_section">
+                <form class="content" action="" method="post" id="form" th:action="@{/signup}" th:object="${user}" >
+                    <div class="text_field" id="first_name_section">
+                        <input placeholder="First name" th:field="*{firstName}" required type="text" />
+                    </div>
+                    <div class="text_field" id="last_name_section">
+                        <input placeholder="Last name" th:field="*{lastName}" required type="text" />
+                    </div>
+
+                    <div class="text_field" id="email_section">
+                        <input id="email" th:field="*{username}" placeholder="Email address" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                               required type="email" />
+                        <p class="info_text info_text_error"  th:if="${email_exists}">
+                            <img th:src="@{/assets/error_icon.svg}"/>
+                            Account with email already exists.</p>
+                    </div>
+                    <div class="text_field" id="password_section">
+                        <input placeholder="Password"  th:field="*{password}" type="password" id="password" />
+                        <button type="button" id="toggle" class="toggle_icon"><img th:src="@{/assets/password_show.svg}" /></button>
+                    </div>
+                    <p class="info_text" th:classappend="${errors} ? info_text_error : clear">
+                        <img th:src="@{/assets/error_icon.svg}" th:if="${errors}"/>
+                        Passwords must contain at least eight characters, including at
+                        least one letter, one number and one special character</p>
+                    <button type="submit">Sign Up</button>
+                    <p class="conditions"> By clicking “Sign Up”, you agree to our <a>Terms, Privacy Policy</a> and
+                        <a>Cookie Policy</a>.
+                    </p>
+
+                </form>
+                <div class="more_options">
+                    <p>Already have an Account? <a href="https://cmd-app.netlify.app/validate" class="link">Sign in</a></p>
+                    <a href="#" class="link">Skip to Home</a>
+                </div>
+                <div style="padding: 10px;"></div>
+            </div>
+            <div class="bottom_section">
+                <div class="bottom_section_item">
+                    <a href="#">English(UK)</a>
+                    <a href="#">English(US)</a>
+                    <a href="#">Francais</a>
+                    <a href="#">Espanol</a>
+                </div>
+                <div class="bottom_section_item">
+                    <a href="#">About</a>
+                    <a href="#">Privacy</a>
+                    <a href="#">Cookie</a>
+                    <a href="#">Terms</a>
+                </div>
+            </div>
+        </div>
     </div>
-    <script th:src="@{http://code.jquery.com/jquery-2.1.0.min.js}"></script>
-
-    <style>
-        #form label {
-            float: left;
-            width: 140px;
-        }
-
-        #error_msg {
-            color: red;
-            font-weight: bold;
-        }
-    </style>
-
-    <script>
-        $(document).ready(function () {
-            const $submitBtn = $("#form input[type='submit']");
-            const $passwordBox = $("#password");
-            const $confirmBox = $("#confirm_password");
-            const $errorMsg = $('<span id="error_msg">Passwords do not match.</span>');
-            const $errorEmailMsg = $('<p style="color: red; font-weight: bold;" id="error">Enter valid Email.</p>');
-            const $emailBox = $("#email");
-            var pattern = new RegExp(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/);
-
-            // This is in case the user hits refresh - some browsers will maintain the disabled state of the button.
-            $submitBtn.removeAttr("disabled");
-
-            function checkMatchingPasswords() {
-                if ($confirmBox.val() !== "" && $passwordBox.val !== "") {
-                    if ($confirmBox.val() !== $passwordBox.val()) {
-                        $submitBtn.attr("disabled", "disabled");
-                        $errorMsg.insertAfter($confirmBox);
-                    }
-                }
-            }
-
-            function checkValidEmail() {
-                    if (!pattern.test($emailBox.val())) {
-
-                        $submitBtn.attr("disabled", "disabled");
-                        $errorEmailMsg.insertBefore($emailBox);
-                    }
-            }
-
-            function resetPasswordError() {
-                $submitBtn.removeAttr("disabled");
-                var $errorCont = $("#error_msg");
-                if ($errorCont.length > 0) {
-                    $errorCont.remove();
-                }
-            }
-
-            function resetEmailError() {
-                console.log("Reset")
-                $submitBtn.removeAttr("disabled");
-                var $errorCont = $("#error");
-                if ($errorCont.length > 0) {
-                    $errorCont.remove();
-                }
-            }
-
-            $("#email")
-            .on("keydown", function (e) {
-                /* only check when the tab or enter keys are pressed
-                 * to prevent the method from being called needlessly  */
-                if (e.keyCode === 13 || e.keyCode === 9) {
-                    checkValidEmail();
-                }
-            })
-                .on("blur", function () {
-                    // also check when the element looses focus (clicks somewhere else)
-                    checkValidEmail();
-                })
-                .on("focus", function () {
-                    // reset the error message when they go to make a change
-                    resetEmailError();
-                })
-
-            $("#confirm_password, #password")
-                .on("keydown", function (e) {
-                    /* only check when the tab or enter keys are pressed
-                     * to prevent the method from being called needlessly  */
-                    if (e.keyCode === 13 || e.keyCode === 9) {
-                        checkMatchingPasswords();
-                    }
-                })
-                .on("blur", function () {
-                    // also check when the element looses focus (clicks somewhere else)
-                    checkMatchingPasswords();
-                })
-                .on("focus", function () {
-                    // reset the error message when they go to make a change
-                    resetPasswordError();
-                })
-
-        });
-    </script>
-    <script th:src="@{https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js}"
-            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-            crossorigin="anonymous"></script>
-</div>
+    <script th:src="@{/js/sign-up.js}"></script>
 </body>
+
 </html>

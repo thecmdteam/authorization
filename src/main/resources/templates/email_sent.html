@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Sent</title>
+    <link rel="stylesheet" th:href="@{/styles/styles.css}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div class="email_container">
+                <img th:src="@{/assets/good_icon.svg}" width="30" height="35" />
+                <div class="email_validation_content">
+                    <p th:text="${message}"></p>
+                    <p>
+                        If you don’t receive an email in your inbox shortly, please make sure you entered the correct
+                        address you created the account with, and check your spam folder
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        <div class="bottom_section">
+            <div class="bottom_section_item">
+                <a href="#">English(UK)</a>
+                <a href="#">English(US)</a>
+                <a href="#">Francais</a>
+                <a href="#">Espanol</a>
+            </div>
+            <div class="bottom_section_item">
+                <a href="#">About</a>
+                <a href="#">Privacy</a>
+                <a href="#">Cookie</a>
+                <a href="#">Terms</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

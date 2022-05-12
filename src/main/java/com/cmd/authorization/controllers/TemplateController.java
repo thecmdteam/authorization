@@ -1,8 +1,13 @@
 package com.cmd.authorization.controllers;
 
 import com.cmd.authorization.dto.UserDTO;
+import com.cmd.authorization.events.RecoverAccountEvent;
+import com.cmd.authorization.model.User;
 import com.cmd.authorization.services.TokenService;
 import com.cmd.authorization.services.UserService;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +20,19 @@ public class TemplateController {
 
 
     private final UserService userService;
+    private final UserDetailsManager manager;
     private final TokenService tokenService;
+    private final ApplicationEventPublisher publisher;
+    private final PasswordEncoder encoder;
 
-    public TemplateController(UserService userService, TokenService tokenService) {
+    public TemplateController(UserService userService, UserDetailsManager manager,
+                              TokenService tokenService, ApplicationEventPublisher publisher,
+                              PasswordEncoder encoder) {
         this.userService = userService;
+        this.manager = manager;
         this.tokenService = tokenService;
+        this.publisher = publisher;
+        this.encoder = encoder;
     }
 
 
@@ -27,20 +40,25 @@ public class TemplateController {
     public String signUp(Model model) {
         UserDTO user = new UserDTO();
         model.addAttribute("user", user);
-        model.addAttribute("errors", null);
+        model.addAttribute("errors", false);
+        model.addAttribute("email_exists", false);
 
         return "signup";
     }
 
     @PostMapping("/signup")
     public String registerUser(@ModelAttribute("user") UserDTO user, Model model) {
-        if(!user.getPassword().equals(user.getMatchingPassword())){
-            model.addAttribute("errors", "Passwords don't match");
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$";
+        if (!user.getPassword().matches(regex)) {
+            model.addAttribute("errors", true);
             return "signup";
         }
-        if (userService.createUser(user))
-            return "registration_consent";
-        model.addAttribute("errors", "Account with email already exists");
+        if (userService.createUser(user)) {
+            model.addAttribute("message",
+                    "Account verification email sent to " + user.getUsername());
+            return "email_sent";
+        }
+        model.addAttribute("email_exists", true);
         return "signup";
     }
 
@@ -62,15 +80,68 @@ public class TemplateController {
         };
     }
 
+    @GetMapping("/recover")
+    public String verifyRecoveryEmail(@RequestParam("token_id") String tokenId, Model model) {
+        var user = tokenService.verifyRecoveryToken(tokenId);
+
+        if (user == null) {
+            model.addAttribute("error", "to be invalid");
+            return "verification_error";
+        }
+
+        return "forward:/changePassword?email=" + user.getUsername();
+    }
+
+    @GetMapping("/changePassword")
+    public String changePassword(Model model) {
+        model.addAttribute("matcherror", false);
+        model.addAttribute("error", false);
+        return "change-password";
+    }
+
+    @PostMapping("/changePassword")
+    public String changePassword(@RequestParam("email") String email,
+                                 @ModelAttribute("password") String password,
+                                 @ModelAttribute("matchPassword") String matchPassword,
+                                 Model model) {
+        String regex = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$";
+        if (!password.matches(regex)) {
+            model.addAttribute("matcherror", true);
+            model.addAttribute("error", false);
+            return "change-password";
+        }
+        if (!password.equals(matchPassword)) {
+            model.addAttribute("matcherror", false);
+            model.addAttribute("error", true);
+            return "change-password";
+        }
+        var user = (User) manager.loadUserByUsername(email);
+        user.setPassword(encoder.encode(password));
+        manager.updateUser(user);
+        return "redirect:https://cmd-app.netlify.app/validate";
+    }
+
+    @GetMapping("/forgotPassword")
+    public String forgotPassword(Model model) {
+        model.addAttribute("error", false);
+        return "recovery_email";
+    }
+
+    @PostMapping("forgotPassword")
+    public String emailLink(@ModelAttribute("email") String email, Model model) {
+        if (manager.userExists(email)) {
+            publisher.publishEvent(new RecoverAccountEvent(email));
+            model.addAttribute("message",
+                    "Account recovery email sent to " + email);
+            return "email_sent";
+        }
+        model.addAttribute("error", true);
+        return "recovery_email";
+    }
+
 
     @GetMapping("/login")
-    public String login(Model model, String error, String logout) {
-        if (error != null)
-            model.addAttribute("errorMsg", "Your username and password are invalid.");
-
-        if (logout != null)
-            model.addAttribute("msg", "You have been logged out successfully.");
-
+    public String login() {
         return "login";
     }
 }

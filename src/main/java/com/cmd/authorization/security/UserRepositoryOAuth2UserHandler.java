@@ -15,6 +15,9 @@
  */
 package com.cmd.authorization.security;
 
+import com.cmd.authorization.repositories.CMDUserRepository;
+import com.cmd.authorization.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Map;

@@ -1,4 +1,3 @@
-
 logging:
   level:
     root: INFO
@@ -8,8 +7,6 @@ logging:
 #    org.springframework.boot.autoconfigure: DEBUG
 
 spring:
-  profiles:
-    active: dev
   datasource:
     url: ${dbHost}
     username: ${dbUsername}
@@ -33,6 +30,34 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: update
+  profiles:
+    active: dev
+  data:
+    mongodb:
+      uri: ${mongoUrl}
+
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google-idp:
+            provider: google
+            client-id: ${google_client}
+            client-secret: ${google_client_secret}
+            scope: ${google_scope}
+            client-name: Sign in with Google
+          github-idp:
+            provider: github
+            client-id: ${github_client}
+            client-secret: ${github_secret}
+            scope: ${github_scope}
+            client-name: Sign in with GitHub
+        provider:
+          google:
+            user-name-attribute: email
+          github:
+            user-name-attribute: login
 
 
 baseUrl: ${baseUrl}

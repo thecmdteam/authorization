@@ -15,7 +15,8 @@ public class UserService {
         private final PasswordEncoder passwordEncoder;
         private final ApplicationEventPublisher applicationEventPublisher;
 
-    public UserService(UserDetailsService userDetailsManager, PasswordEncoder passwordEncoder, ApplicationEventPublisher applicationEventPublisher) {
+    public UserService(UserDetailsService userDetailsManager, PasswordEncoder passwordEncoder,
+                       ApplicationEventPublisher applicationEventPublisher) {
         this.userDetailsManager = (JdbcUserDetailsManager) userDetailsManager;
         this.passwordEncoder = passwordEncoder;
         this.applicationEventPublisher = applicationEventPublisher;
@@ -23,12 +24,13 @@ public class UserService {
 
 
     public boolean createUser(UserDTO user) {
-        if (userDetailsManager.userExists(user.getEmail())) {
+        if (userDetailsManager.userExists(user.getUsername())) {
             return false;
         } else {
             User newUser = mapUser(user);
+
             userDetailsManager.createUser(newUser);
-            applicationEventPublisher.publishEvent(new CreateNewUserEvent(user));
+            applicationEventPublisher.publishEvent(new CreateNewUserEvent(user, true));
             return true;
         }
     }
@@ -36,7 +38,7 @@ public class UserService {
     private User mapUser(UserDTO user) {
         User newUser = new User();
         newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        newUser.setUsername(user.getEmail());
+        newUser.setUsername(user.getUsername());
         return newUser;
     }
 }
